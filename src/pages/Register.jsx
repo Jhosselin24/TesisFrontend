@@ -2,32 +2,51 @@ import { useState } from "react"
 import {
   MdVisibility,
   MdVisibilityOff,
-  MdAutoStories,
-  MdPerson,
-  MdEmail,
-  MdLocationCity,
-  MdCake,
-  MdLockOpen
+  MdAutoStories
 } from "react-icons/md"
 
 import { Link, useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import { ToastContainer } from "react-toastify"
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+
 import { useFetch } from "../hooks/useFetch"
 import { API_BASE_URL } from "../utils/auth"
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+
   const navigate = useNavigate()
   const fetchDataBackend = useFetch()
-  const { register, handleSubmit, formState: { errors } } = useForm()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm()
 
   const registerUser = async (dataForm) => {
-    const url = `${API_BASE_URL}/usuarios/usuarios`
-    const response = await fetchDataBackend(url, dataForm, "POST")
+    try {
+      setLoading(true)
 
-    if (response) {
-      navigate("/login")
+      const url = `${API_BASE_URL}/usuarios/usuarios`
+      const response = await fetchDataBackend(url, dataForm, "POST")
+
+      if (response) {
+        toast.success("Usuario registrado correctamente")
+        setTimeout(() => {
+          navigate("/login")
+        }, 1500)
+      } else {
+        toast.error("No se pudo registrar el usuario")
+      }
+
+    } catch (error) {
+      console.error(error)
+      toast.error("Error en el servidor")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -44,7 +63,9 @@ const Register = () => {
     <div className="flex h-screen bg-[#f8f9fa] font-sans overflow-hidden">
       <ToastContainer />
 
-      <div className="w-full lg:w-7/12 flex flex-col items-center overflow-y-auto px-6 py-12">
+      {/* FORMULARIO */}
+      <div className="w-full flex flex-col items-center justify-center px-6">
+
         <div className="w-full max-w-2xl">
 
           <header className="text-center mb-10">
@@ -52,61 +73,75 @@ const Register = () => {
               <MdAutoStories size={50} />
             </div>
 
-            <h1 className="text-3xl font-black text-[#2c3e50] uppercase tracking-tighter">
+            <h1 className="text-3xl font-black text-[#2c3e50] uppercase">
               Circulo Literario <span className="text-[#e67e22]">EC</span>
             </h1>
 
-            <p className="text-gray-500 mt-2 font-medium italic">
-              Tu próxima gran lectura comienza aquí.
+            <p className="text-gray-500 mt-2 italic">
+              Crea tu cuenta y empieza a leer
             </p>
           </header>
 
           <form
             onSubmit={handleSubmit(registerUser)}
-            className="space-y-6 bg-white p-8 rounded-2xl shadow-sm border border-gray-100"
+            className="space-y-5 bg-white p-8 rounded-2xl shadow"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-              <div>
-                <label className={labelStyle}>Nombres</label>
-                <input
-                  className={inputStyle}
-                  placeholder="Tus nombres"
-                  {...register("nombres", { required: "Obligatorio" })}
-                />
-                {errors.nombres && <p className={errorStyle}>{errors.nombres.message}</p>}
-              </div>
-
-              <div>
-                <label className={labelStyle}>Apellidos</label>
-                <input
-                  className={inputStyle}
-                  placeholder="Tus apellidos"
-                  {...register("apellidos", { required: "Obligatorio" })}
-                />
-                {errors.apellidos && <p className={errorStyle}>{errors.apellidos.message}</p>}
-              </div>
-
+            {/* NOMBRES */}
+            <div>
+              <label className={labelStyle}>Nombres</label>
+              <input
+                className={inputStyle}
+                {...register("nombres", {
+                  required: "Nombres son obligatorios"
+                })}
+              />
+              {errors.nombres && <p className={errorStyle}>{errors.nombres.message}</p>}
             </div>
 
+            {/* APELLIDOS */}
+            <div>
+              <label className={labelStyle}>Apellidos</label>
+              <input
+                className={inputStyle}
+                {...register("apellidos", {
+                  required: "Apellidos son obligatorios"
+                })}
+              />
+              {errors.apellidos && <p className={errorStyle}>{errors.apellidos.message}</p>}
+            </div>
+
+            {/* EMAIL */}
             <div>
               <label className={labelStyle}>Email</label>
               <input
                 className={inputStyle}
-                placeholder="correo@ejemplo.com"
-                {...register("email", { required: "Obligatorio" })}
+                {...register("email", {
+                  required: "Email obligatorio",
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: "Email inválido"
+                  }
+                })}
               />
               {errors.email && <p className={errorStyle}>{errors.email.message}</p>}
             </div>
 
+            {/* PASSWORD */}
             <div>
               <label className={labelStyle}>Contraseña</label>
+
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   className={inputStyle}
-                  placeholder="********"
-                  {...register("password", { required: "Obligatorio" })}
+                  {...register("password", {
+                    required: "Contraseña obligatoria",
+                    minLength: {
+                      value: 6,
+                      message: "Mínimo 6 caracteres"
+                    }
+                  })}
                 />
 
                 <button
@@ -121,8 +156,12 @@ const Register = () => {
               {errors.password && <p className={errorStyle}>{errors.password.message}</p>}
             </div>
 
-            <button className="w-full bg-[#e67e22] text-white font-bold py-3 rounded-xl hover:bg-[#d35400] transition">
-              Crear cuenta
+            {/* BOTÓN */}
+            <button
+              disabled={loading}
+              className="w-full bg-[#e67e22] text-white font-bold py-3 rounded-xl hover:bg-[#d35400] transition disabled:opacity-50"
+            >
+              {loading ? "Creando cuenta..." : "Crear cuenta"}
             </button>
           </form>
 
@@ -133,13 +172,6 @@ const Register = () => {
           </div>
 
         </div>
-      </div>
-
-      {/* LADO DERECHO */}
-      <div className="hidden lg:block lg:w-5/12 bg-[#2c3e50] text-white flex items-center justify-center p-10">
-        <h2 className="text-4xl font-bold">
-          Bienvenido al Club Literario
-        </h2>
       </div>
     </div>
   )
