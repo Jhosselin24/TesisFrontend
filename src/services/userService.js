@@ -1,149 +1,39 @@
 import api from "./api";
 
-/*OBTENER TODOS LOS USUARIOS*/
+/* OBTENER MODERADORES */
 export const getUsers = async () => {
-
   try {
-
-    const token = localStorage.getItem("token");
-
-    const response = await api.get(
-      "/users",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
+    const response = await api.get("/usuario/listar-moderadores");
     return response.data;
-
   } catch (error) {
-
-    console.error(
-      "Error al obtener usuarios:",
-      error
-    );
-
+    console.error("Error al obtener moderadores:", error);
     throw error;
   }
 };
 
-/*ACTUALIZAR USUARIO*/
-export const updateUser = async (id, data) => {
-
+/* CREAR MODERADOR */
+export const createUser = async (data) => {
   try {
-
-    const token = localStorage.getItem("token");
-
-    const response = await api.put(
-      `/users/${id}`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+    const response = await api.post(
+      "/usuario/crear-moderador",
+      data
     );
-
     return response.data;
-
   } catch (error) {
-
-    console.error(
-      "Error al actualizar usuario:",
-      error
-    );
-
+    console.error("Error al crear moderador:", error);
     throw error;
   }
 };
 
-/*ELIMINAR USUARIO*/
-export const deleteUser = async (id) => {
-
-  try {
-
-    const token = localStorage.getItem("token");
-
-    const response = await api.delete(
-      `/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    return response.data;
-
-  } catch (error) {
-
-    console.error(
-      "Error al eliminar usuario:",
-      error
-    );
-
-    throw error;
-  }
+/* Estas funciones aún no existen en backend */
+export const deleteUser = async () => {
+  console.warn("Ruta eliminar moderador no implementada");
 };
 
-/*CAMBIAR ROL*/
-export const changeRole = async (id, role) => {
-
-  try {
-
-    const token = localStorage.getItem("token");
-
-    const response = await api.patch(
-      `/users/${id}/role`,
-      { role },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    return response.data;
-
-  } catch (error) {
-
-    console.error(
-      "Error al cambiar rol:",
-      error
-    );
-
-    throw error;
-  }
+export const changeRole = async () => {
+  console.warn("Ruta cambiar rol no implementada");
 };
 
-/*BLOQUEAR USUARIO*/
-export const blockUser = async (id) => {
-
-  try {
-
-    const token = localStorage.getItem("token");
-
-    const response = await api.patch(
-      `/users/${id}/block`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    return response.data;
-
-  } catch (error) {
-
-    console.error(
-      "Error al bloquear usuario:",
-      error
-    );
-
-    throw error;
-  }
+export const blockUser = async () => {
+  console.warn("Ruta bloquear moderador no implementada");
 };
