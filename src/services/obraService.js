@@ -1,58 +1,108 @@
 import api from "./api";
 
-// obtener todas las obras
-export const getObras = async () => {
-  const res = await api.get("/obras");
-  return res.data;
-};
+/*OBTENER VOTOS DE UNA OBRA*/
+export const obtenerVotos = async (id) => {
 
-// crear obra (CON PORTADA)
-export const createObra = async (data) => {
-  const formData = new FormData();
+    try {
 
-  formData.append("titulo", data.titulo);
-  formData.append("descripcion", data.descripcion);
-  formData.append("autor", data.autor);
-  formData.append("estado", data.estado);
+        const response = await api.get(
+            `/obras/${id}/votos`
+        );
 
-  // imagen portada
-  if (data.portada) {
-    formData.append("portada", data.portada);
-  }
+        return response.data;
 
-  const res = await api.post("/obras", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
+    } catch (error) {
+
+        console.error(
+            "Error al obtener votos:",
+            error
+        );
+
+        throw error;
     }
-  });
-
-  return res.data;
 };
 
-// actualizar obra (CON PORTADA OPCIONAL)
-export const updateObra = async (id, data) => {
-  const formData = new FormData();
+/*VOTAR OBRA*/
+export const votarObra = async (id) => {
 
-  formData.append("titulo", data.titulo);
-  formData.append("descripcion", data.descripcion);
-  formData.append("autor", data.autor);
-  formData.append("estado", data.estado);
+    try {
 
-  if (data.portada) {
-    formData.append("portada", data.portada);
-  }
+        const token = localStorage.getItem("token");
 
-  const res = await api.put(`/obras/${id}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
+        const response = await api.post(
+            `/obras/${id}/votar`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        return response.data;
+
+    } catch (error) {
+
+        console.error(
+            "Error al votar obra:",
+            error
+        );
+
+        throw error;
     }
-  });
+};
+/*
+|--------------------------------------------------------------------------
+| OBTENER LIKES
+|--------------------------------------------------------------------------
+*/
+export const obtenerLikes = async (id) => {
 
-  return res.data;
+    try {
+
+        const response = await api.get(
+            `/obras/${id}/likes`
+        );
+
+        return response.data;
+
+    } catch (error) {
+
+        console.error(
+            "Error al obtener likes:",
+            error
+        );
+
+        throw error;
+    }
 };
 
-// eliminar obra
-export const deleteObra = async (id) => {
-  const res = await api.delete(`/obras/${id}`);
-  return res.data;
+/*DAR LIKE A OBRA*/
+export const likeObra = async (id) => {
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const response = await api.post(
+            `/obras/${id}/like`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        return response.data;
+
+    } catch (error) {
+
+        console.error(
+            "Error al dar like:",
+            error
+        );
+
+        throw error;
+    }
 };

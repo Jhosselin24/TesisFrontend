@@ -1,107 +1,127 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Login from "./pages/Login"
-import Home from "./pages/Home"
-import Register from "./pages/Register"
-import Comunidad from "./pages/Comunidad"
-import Beneficios from "./pages/Beneficios"
-import Contacto from "./pages/Contacto"
-import Capitulos from "./pages/Capitulos"
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Comunidad from "./pages/Comunidad";
+import Beneficios from "./pages/Beneficios";
+import Contacto from "./pages/Contacto";
+import AdminUsers from "./pages/AdminUsers";
+import Forbidden from "./pages/Forbidden";
+import Details from "./pages/Details";
+import PrivateRoute from "./components/PrivateRoute";
+import AdminRoute from "./components/AdminRoute";
+import Logs from "./pages/Logs";
 
-import Navbar from "./components/Navbar"
-import PrivateRoute from "./components/PrivateRoute"
-import { AuthProvider } from "./context/AuthContext"
+import Navbar from "./components/Navbar";
+
+import { isAdmin } from "./services/authService";
 
 function App() {
-  const isAuth = localStorage.getItem("token")
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
 
-        <div className="min-h-screen bg-[#FEF2E1]">
+      <div className="min-h-screen bg-[#FEF2E1]">
 
-          <Navbar />
+        <Navbar />
 
-          <Routes>
+        <Routes>
 
-            {/* 🔥 REDIRECCIÓN DINÁMICA INICIAL */}
-            <Route
-              path="/"
-              element={
-                isAuth
-                  ? <Navigate to="/home" replace />
-                  : <Navigate to="/login" replace />
-              }
-            />
+          {/* REDIRECCION */}
+          <Route
+            path="/"
+            element={<Navigate to="/login" replace />}
+          />
 
-            {/* PUBLICAS */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+          {/* PUBLICAS */}
+          <Route
+            path="/login"
+            element={<Login />}
+          />
 
-            {/* PRIVADAS */}
-            <Route
-              path="/home"
-              element={
-                <PrivateRoute>
-                  <Home />
-                </PrivateRoute>
-              }
-            />
+          <Route
+            path="/register"
+            element={<Register />}
+          />
 
-            <Route
-              path="/comunidad"
-              element={
-                <PrivateRoute>
-                  <Comunidad />
-                </PrivateRoute>
-              }
-            />
+          {/* PRIVADAS */}
+          <Route
+            path="/home"
+            element={
+              <PrivateRoute>
+              <Home />
+          </PrivateRoute>}
+          />
 
-            <Route
-              path="/beneficios"
-              element={
-                <PrivateRoute>
-                  <Beneficios />
-                </PrivateRoute>
-              }
-            />
+          <Route
+            path="/comunidad"
+            element={
+              <PrivateRoute>
+                <Comunidad />
+              </PrivateRoute>}
+          />
 
-            <Route
-              path="/contacto"
-              element={
-                <PrivateRoute>
-                  <Contacto />
-                </PrivateRoute>
-              }
-            />
+          <Route
+            path="/beneficios"
+            element={
+              <PrivateRoute>
+                <Beneficios />
+              </PrivateRoute>}
+          />
 
-            <Route
-              path="/obras/:id/capitulos"
-              element={
-                <PrivateRoute>
-                  <Capitulos />
-                </PrivateRoute>
-              }
-            />
+          <Route
+            path="/contacto"
+            element={
+              <PrivateRoute>
+                <Contacto />
+              </PrivateRoute>}
+          />
 
-            {/* 🔥 FALLBACK */}
-            <Route
-              path="*"
-              element={
-                isAuth
-                  ? <Navigate to="/home" replace />
-                  : <Navigate to="/login" replace />
-              }
-            />
+          {/* DETAILS */}
+          <Route
+            path="/details"
+            element={
+              <PrivateRoute>
+                <Details />
+              </PrivateRoute>}
+          />
 
-          </Routes>
+          {/* ADMIN */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminUsers />
+              </AdminRoute>}
+          />
 
-        </div>
+          <Route
+            path="/logs"
+            element={
+              <AdminRoute>
+                <Logs />
+              </AdminRoute>}
+          />
 
-      </BrowserRouter>
-    </AuthProvider>
-  )
+          {/* FORBIDDEN */}
+          <Route
+            path="/forbidden"
+            element={<Forbidden />}
+          />
+
+          {/* 404 */}
+          <Route
+            path="*"
+            element={<Navigate to="/login" replace />}
+          />
+
+        </Routes>
+
+      </div>
+
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
